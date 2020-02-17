@@ -18,7 +18,7 @@
       }
     };
 
-    const handleResponse = (xhr) => {
+    const handleResponse = (xhr, code) => {
         const content = document.querySelector('#content');
 
         switch(xhr.status)
@@ -28,6 +28,9 @@
             break;
           case 201:
             content.innerHTML = '<b>Create</b>';
+            break;
+          case 204:
+            content.innerHTML = '<b>Update</b>';
             break;
           case 400:
             content.innerHTML = '<b>Bad Request</b>';
@@ -40,8 +43,38 @@
             break;
         }
         parseJSON(xhr, content);
-    };
 
+
+        if(code)
+        {
+          const obj = JSON.parse(xhr.response);
+          content.innerHTML =`<p>${obj}</p>`;
+        }
+    };
+    const requestMade = (e, UserForm) =>
+    {
+      e.preventDefault();
+      
+      const url = UserForm.querySelector('#urlField').value;
+      const method = UserForm.querySelector('#methodSelect').value;
+
+      const xhr = new XMLHttpRequest();
+      xhr.open(url, method);
+
+      xhr.setRequestHeader('Accept', 'application/json');
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+
+      if(method === 'GET')
+      {
+        xhr.onload = () => handleResponse(xhr, true);
+        //return true;
+      }
+      else if(method === 'HEAD'){
+        xhr.onload = () => handleResponse(xhr, false);
+       // return false;
+      }
+      xhr.send();
+    }
 
     const sendPost = (e, nameForm) => {
       e.preventDefault();
@@ -68,10 +101,13 @@
 
     const init = () => {
       const nameForm = document.querySelector('#nameForm');
+      const UserForm = document.querySelector('#userForm');
       
       const addUser = (e) => sendPost(e, nameForm);
+      const sendForm = (e) => requestMade(e, UserForm);
       
       nameForm.addEventListener('submit', addUser);
+      UserForm.addEventListener('submit', UserForm);
     };
 
     window.onload = init;

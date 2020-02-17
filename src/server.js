@@ -7,7 +7,7 @@ const jsonHandler = require('./response.js');
 const port = process.env.PORT || process.env.NODE_PORT || 3000;
 
 const handlePost = (request, response, parsedUrl) => {
-  if(parsedUrl.pathname === '/addUser'){
+  
     const body = [];
 
     request.on('error', (err) => {
@@ -26,10 +26,10 @@ const handlePost = (request, response, parsedUrl) => {
       jsonHandler.addUser(request, response, bodyParams);
     });
 
-  }
+  
 };
 
-const handleGet = (request, response, parsedUrl) => {
+/*const handleGet = (request, response, parsedUrl) => {
   if (parsedUrl.pathname === '/style.css') {
     htmlHandler.getCss(request, response);
   } else if (parsedUrl.pathname === '/getUsers') {
@@ -37,25 +37,34 @@ const handleGet = (request, response, parsedUrl) => {
   } else {
     htmlHandler.getIndex(request, response);
   }
-};
-
-/*const urlStruct = {
-  '/': htmlHandler.getIndex,
-  '/success': jsonHandler.success,
-  '/badRequest': jsonHandler.badRequest,
-  '/style': htmlHandler.getCss,
-  notFound: jsonHandler.notFound,
 };*/
+
+const urlStruct = {
+  GET: {
+  '/': htmlHandler.getIndex,
+  '/style': htmlHandler.getCss,
+  '/getUsers': jsonHandler.getUsers,
+  '/notReal': jsonHandler.notFound,
+  notFound: jsonHandler.notFound,
+  },
+  POST: {
+    '/addUser': handlePost,
+  },
+  HEAD: {
+    '/getUsers': jsonHandler.getUsersMeta,
+    '/notReal': jsonHandler.notFoundMeta,
+  },
+};
 
 const onRequest = (request, response) => {
   const parsedUrl = url.parse(request.url);
 
-  if(request.method === 'POST')
+  if(urlStruct[request.method][parsedUrl.pathname])
   {
-    handlePost(request, response, parsedUrl);
+    urlStruct[request.method][parsedUrl.pathname](request,response);
   }
   else{
-    handleGet(request,response, parsedUrl);
+    urlStruct[request.method].notFound(request,response);
   }
 };
 

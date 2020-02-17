@@ -17,9 +17,14 @@ const respondJSONMeta = (request, response, status) => {
 const getUsers = (request, response) => {
   const responseJSON = {
     Users,
+    message:'This is a successful response',
   };
 
   respondJSON(request, response, 200, responseJSON);
+};
+
+const getUsersMeta = (request, response, status) => {
+  respondJSON(request, response, 200);
 };
 
 
@@ -53,7 +58,16 @@ const addUser = (request, response, body) => {
   return respondJSONMeta(request, response,responseCode);
 };
 
+const notFound = (request, response) => {
+  const responseJSON = {
+    message: 'The page you are looking for was not found.',
+    id: 'notFound',
+  };
 
+  respondJSON(request, response, 404, responseJSON);
+};
+
+const notFoundMeta = (request, response, type) => respondJSONMeta(request, response, 404);
 
 /* 200
 const success = (request, response) => {
@@ -81,16 +95,12 @@ const badRequest = (request, response, params) => {
 };
 
 // 404
-const notFound = (request, response) => {
-  const responseJSON = {
-    message: 'The page you are looking for was not found.',
-    id: 'notFound',
-  };
-
-  respondJSON(request, response, 404, responseJSON);
-};*/
+*/
 
 module.exports = {
+  getUsersMeta,
+  notFound,
+  notFoundMeta,
   getUsers,
   addUser,
 };
